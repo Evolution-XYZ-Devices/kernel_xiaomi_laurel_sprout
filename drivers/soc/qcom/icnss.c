@@ -1569,6 +1569,12 @@ static int icnss_modem_notifier_nb(struct notifier_block *nb,
 	}
 
 	if (code == SUBSYS_BEFORE_SHUTDOWN && !notif->crashed &&
+	    atomic_read(&priv->is_shutdown)) {
+		atomic_set(&priv->is_shutdown, false);
+		icnss_call_driver_remove(priv);
+	}
+
+	if (code == SUBSYS_BEFORE_SHUTDOWN && !notif->crashed &&
 	    test_bit(ICNSS_BLOCK_SHUTDOWN, &priv->state)) {
 		if (!wait_for_completion_timeout(&priv->unblock_shutdown,
 				msecs_to_jiffies(PROBE_TIMEOUT)))
