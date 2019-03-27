@@ -3394,11 +3394,11 @@ static void scsi_disk_release(struct device *dev)
 	struct scsi_disk *sdkp = to_scsi_disk(dev);
 	struct gendisk *disk = sdkp->disk;
 	struct request_queue *q = disk->queue;
-
+	
 	spin_lock(&sd_index_lock);
 	ida_remove(&sd_index_ida, sdkp->index);
 	spin_unlock(&sd_index_lock);
-
+	
 	/*
 	 * Wait until all requests that are in progress have completed.
 	 * This is necessary to avoid that e.g. scsi_end_request() crashes
