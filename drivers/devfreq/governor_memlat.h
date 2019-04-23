@@ -1,6 +1,10 @@
 /*
+<<<<<<< HEAD
  * Copyright (c) 2015-2017, The Linux Foundation. All rights reserved.
  * Copyright (C) 2019 XiaoMi, Inc.
+=======
+ * Copyright (c) 2015-2017, 2019, The Linux Foundation. All rights reserved.
+>>>>>>> 613750c84e0e... devfreq: detect ddr type and add frequency table accordingly
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -63,6 +67,7 @@ struct memlat_hwmon {
 	int (*start_hwmon)(struct memlat_hwmon *hw);
 	void (*stop_hwmon)(struct memlat_hwmon *hw);
 	unsigned long (*get_cnt)(struct memlat_hwmon *hw);
+	struct device_node *(*get_child_of_node)(struct device *dev);
 	struct device *dev;
 	struct device_node *of_node;
 
