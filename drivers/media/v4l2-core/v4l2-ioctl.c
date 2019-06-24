@@ -2941,9 +2941,10 @@ long
 video_usercopy(struct file *file, unsigned int cmd, unsigned long arg,
 	       v4l2_kioctl func)
 {
-	char	sbuf[128];
+        char    sbuf[128];
 	void    *mbuf = NULL, *array_buf = NULL;
-	void	*parg = (void *)arg;
+	char	sbuf[SZ_1K];
+        void	*parg = (void *)arg;
 	long	err  = -EINVAL;
 	bool	has_array_args;
 	bool	always_copy = false;
