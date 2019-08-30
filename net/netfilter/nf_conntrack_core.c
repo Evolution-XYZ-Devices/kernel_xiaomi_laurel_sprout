@@ -804,19 +804,13 @@ __nf_conntrack_confirm(struct sk_buff *skb)
 	 * or broadcast/multicast packets do skb_clone with
 	 * unconfirmed conntrack.
 	 */
-<<<<<<< HEAD
-	WARN_ON(nf_ct_is_confirmed(ct));
-	pr_debug("Confirming conntrack %pK\n", ct);
-=======
 	if (unlikely(nf_ct_is_confirmed(ct))) {
 		WARN_ON_ONCE(1);
 		nf_conntrack_double_unlock(hash, reply_hash);
 		local_bh_enable();
 		return NF_DROP;
 	}
-
-	pr_debug("Confirming conntrack %p\n", ct);
->>>>>>> 91a604c2e129... netfilter: conntrack: fix cloned unconfirmed skb->_nfct race in __nf_conntrack_confirm
+	pr_debug("Confirming conntrack %pK\n", ct);
 	/* We have to check the DYING flag after unlink to prevent
 	 * a race against nf_ct_get_next_corpse() possibly called from
 	 * user context, else we insert an already 'dead' hash, blocking
