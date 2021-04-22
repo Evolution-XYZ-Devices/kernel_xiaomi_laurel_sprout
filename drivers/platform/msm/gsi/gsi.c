@@ -1022,7 +1022,6 @@ int gsi_is_mcs_enabled(void)
 
 	return (mcs_enable & GSI_GSI_MCS_CFG_MCS_ENABLE_BMSK);
 }
-EXPORT_SYMBOL(gsi_is_mcs_enabled);
 
 
 int gsi_register_device(struct gsi_per_props *props, unsigned long *dev_hdl)
