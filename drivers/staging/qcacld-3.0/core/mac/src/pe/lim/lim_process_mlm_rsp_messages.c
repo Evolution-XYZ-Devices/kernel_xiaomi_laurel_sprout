@@ -712,6 +712,8 @@ lim_fill_assoc_ind_params(tpAniSirGlobal mac_ctx,
 		sizeof(tSirMacAddr));
 	/* Fill in authType */
 	sme_assoc_ind->authType = assoc_ind->authType;
+	/* Fill in rsn_akm_type */
+	sme_assoc_ind->akm_type = assoc_ind->akm_type;
 	/* Fill in ssId */
 	qdf_mem_copy((uint8_t *) &sme_assoc_ind->ssId,
 		(uint8_t *) &(assoc_ind->ssId), assoc_ind->ssId.length + 1);
@@ -768,6 +770,7 @@ lim_fill_assoc_ind_params(tpAniSirGlobal mac_ctx,
 		sme_assoc_ind->VHTCaps = assoc_ind->vht_caps;
 	sme_assoc_ind->capability_info = assoc_ind->capabilityInfo;
 	sme_assoc_ind->he_caps_present = assoc_ind->he_caps_present;
+	sme_assoc_ind->is_sae_authenticated = assoc_ind->is_sae_authenticated;
 }
 
 /**
@@ -1990,7 +1993,15 @@ void lim_process_ap_mlm_add_sta_rsp(tpAniSirGlobal pMac,
 	 * 2) PE receives eWNI_SME_ASSOC_CNF from SME
 	 * 3) BTAMP-AP sends Re/Association Response to BTAMP-STA
 	 */
-	lim_send_mlm_assoc_ind(pMac, pStaDs, psessionEntry);
+	if (lim_send_mlm_assoc_ind(pMac, pStaDs, psessionEntry) !=
+							QDF_STATUS_SUCCESS) {
+		lim_reject_association(pMac, pStaDs->staAddr,
+				       pStaDs->mlmStaContext.subType,
+				       true, pStaDs->mlmStaContext.authType,
+				       pStaDs->assocId, true,
+				       eSIR_MAC_UNSPEC_FAILURE_STATUS,
+				       psessionEntry);
+	}
 	/* fall though to reclaim the original Add STA Response message */
 end:
 	if (0 != limMsgQ->bodyptr) {

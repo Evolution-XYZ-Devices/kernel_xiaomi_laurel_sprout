@@ -200,6 +200,7 @@ enum csr_roam_stats_classtypes {
 	eCsrMaxStats
 };
 
+#ifdef FEATURE_WLAN_DIAG_SUPPORT
 enum csr_diagwlan_status_eventsubtype {
 	eCSR_WLAN_STATUS_CONNECT = 0,
 	eCSR_WLAN_STATUS_DISCONNECT
@@ -217,6 +218,8 @@ enum csr_diagwlan_status_eventreason {
 	eCSR_REASON_ROAM_HO_FAIL,
 
 };
+
+#endif /* FEATURE_WLAN_DIAG_SUPPORT */
 
 struct csr_channel {
 	uint8_t numChannels;
@@ -936,19 +939,11 @@ struct csr_roam_session {
 	uint32_t nWpaRsnReqIeLength;
 	/* contain the WPA/RSN IE in assoc req or one sent in beacon(IBSS) */
 	uint8_t *pWpaRsnReqIE;
-	/* the byte count for pWpaRsnRspIE */
-	uint32_t nWpaRsnRspIeLength;
-	/* this contain the WPA/RSN IE in beacon/probe rsp */
-	uint8_t *pWpaRsnRspIE;
 #ifdef FEATURE_WLAN_WAPI
 	/* the byte count of pWapiReqIE; */
 	uint32_t nWapiReqIeLength;
 	/* this contain the WAPI IE in assoc req or one sent in beacon (IBSS) */
 	uint8_t *pWapiReqIE;
-	/* the byte count for pWapiRspIE */
-	uint32_t nWapiRspIeLength;
-	/* this contain the WAPI IE in beacon/probe rsp */
-	uint8_t *pWapiRspIE;
 #endif /* FEATURE_WLAN_WAPI */
 	uint32_t nAddIEScanLength;      /* the byte count of pAddIeScanIE; */
 	/* contains the additional IE in (unicast) probe req at time of join */
@@ -1014,7 +1009,7 @@ struct csr_roam_session {
 	bool nss_forced_1x1;
 	bool disable_hi_rssi;
 	bool dhcp_done;
-	uint8_t disconnect_reason;
+	tSirMacReasonCodes disconnect_reason;
 	uint8_t uapsd_mask;
 	struct scan_cmd_info scan_info;
 	qdf_mc_timer_t roaming_offload_timer;
@@ -1308,9 +1303,6 @@ QDF_STATUS csr_ready(tpAniSirGlobal pMac);
 #ifdef FEATURE_WLAN_WAPI
 QDF_STATUS csr_roam_get_wapi_req_ie(tpAniSirGlobal pMac,
 		uint32_t sessionId, uint32_t *pLen, uint8_t *pBuf);
-QDF_STATUS csr_roam_get_wapi_rsp_ie(tpAniSirGlobal pMac,
-						uint32_t sessionId,
-		uint32_t *pLen, uint8_t *pBuf);
 uint8_t csr_construct_wapi_ie(tpAniSirGlobal pMac, uint32_t sessionId,
 		struct csr_roam_profile *pProfile,
 		tSirBssDescription *pSirBssDesc,

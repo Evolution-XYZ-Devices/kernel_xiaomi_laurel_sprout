@@ -1060,8 +1060,8 @@ QDF_STATUS wlan_ipa_uc_disable_pipes(struct wlan_ipa_priv *ipa_ctx)
 
 	qdf_spin_lock_bh(&ipa_ctx->pipes_down_lock);
 	if (ipa_ctx->pipes_down_in_progress || ipa_ctx->ipa_pipes_down) {
-		ipa_warn("IPA WDI Pipes down already in progress");
 		qdf_spin_unlock_bh(&ipa_ctx->pipes_down_lock);
+		ipa_warn("IPA WDI Pipes down already in progress");
 		return QDF_STATUS_E_ALREADY;
 	}
 	ipa_ctx->pipes_down_in_progress = true;
@@ -2566,7 +2566,8 @@ QDF_STATUS wlan_ipa_cleanup(struct wlan_ipa_priv *ipa_ctx)
 	/* Teardown IPA sys_pipe for MCC */
 	if (wlan_ipa_uc_sta_is_enabled(ipa_ctx->config)) {
 		wlan_ipa_teardown_sys_pipe(ipa_ctx);
-		qdf_cancel_work(&ipa_ctx->mcc_work);
+		if (ipa_ctx->uc_loaded)
+			qdf_cancel_work(&ipa_ctx->mcc_work);
 	}
 
 	wlan_ipa_wdi_destroy_rm(ipa_ctx);
