@@ -2377,9 +2377,7 @@ void *wmi_unified_attach(void *scn_handle,
 
 	wmi_wbuff_register(wmi_handle);
 
-#ifdef WMI_INTERFACE_EVENT_LOGGING
 	wmi_hang_event_notifier_register(wmi_handle);
-#endif
 
 	return wmi_handle;
 
@@ -2403,9 +2401,7 @@ void wmi_unified_detach(struct wmi_unified *wmi_handle)
 	struct wmi_soc *soc;
 	uint8_t i;
 
-#ifdef WMI_INTERFACE_EVENT_LOGGING
 	wmi_hang_event_notifier_unregister();
-#endif
 
 	wmi_wbuff_deregister(wmi_handle);
 
@@ -2446,6 +2442,11 @@ void wmi_unified_detach(struct wmi_unified *wmi_handle)
 	if (soc->wmi_ext_service_bitmap) {
 		qdf_mem_free(soc->wmi_ext_service_bitmap);
 		soc->wmi_ext_service_bitmap = NULL;
+	}
+
+	if (soc->wmi_ext2_service_bitmap) {
+		qdf_mem_free(soc->wmi_ext2_service_bitmap);
+		soc->wmi_ext2_service_bitmap = NULL;
 	}
 
 	/* Decrease the ref count once refcount infra is present */

@@ -879,7 +879,7 @@ static void __policy_mgr_check_sta_ap_concurrent_ch_intf(void *data)
 	struct policy_mgr_psoc_priv_obj *pm_ctx = NULL;
 	struct sta_ap_intf_check_work_ctx *work_info = NULL;
 	uint32_t mcc_to_scc_switch, cc_count = 0, i;
-	QDF_STATUS status;
+	QDF_STATUS status = QDF_STATUS_SUCCESS;
 	uint8_t channel, sec_ch;
 	uint8_t operating_channel[MAX_NUMBER_OF_CONC_CONNECTIONS];
 	uint8_t vdev_id[MAX_NUMBER_OF_CONC_CONNECTIONS];
@@ -959,14 +959,9 @@ static void __policy_mgr_check_sta_ap_concurrent_ch_intf(void *data)
 				break;
 			}
 		}
+end:
 	if (status != QDF_STATUS_SUCCESS)
 		policy_mgr_err("Failed to switch SAP channel");
-end:
-	if (work_info) {
-		qdf_mem_free(work_info);
-		if (pm_ctx)
-			pm_ctx->sta_ap_intf_check_work_info = NULL;
-	}
 }
 
 void policy_mgr_check_sta_ap_concurrent_ch_intf(void *data)
@@ -1051,7 +1046,8 @@ QDF_STATUS policy_mgr_valid_sap_conc_channel_check(
 		    wlan_reg_is_passive_or_disable_ch(pm_ctx->pdev, channel) ||
 		    !(policy_mgr_sta_sap_scc_on_lte_coex_chan(psoc) ||
 		    policy_mgr_is_safe_channel(psoc, channel)) ||
-		    (!reg_is_etsi13_srd_chan_allowed_master_mode(pm_ctx->pdev)
+		    (!reg_is_etsi13_srd_chan_allowed_master_mode(pm_ctx->pdev,
+		      QDF_SAP_MODE)
 		    && reg_is_etsi13_srd_chan(pm_ctx->pdev, channel))) {
 			if (wlan_reg_is_dfs_ch(pm_ctx->pdev, channel) &&
 			    sta_sap_scc_on_dfs_chan) {
@@ -1127,6 +1123,10 @@ void policy_mgr_check_concurrent_intf_and_restart_sap(
 		policy_mgr_err("Invalid context");
 		return;
 	}
+	if (!pm_ctx->sta_ap_intf_check_work_info) {
+		policy_mgr_err("Invalid sta_ap_intf_check_work_info");
+		return;
+	}
 	if (policy_mgr_get_connection_count(psoc) == 1) {
 		/*
 		 * If STA+SAP sessions are on DFS channel and STA+SAP SCC is
@@ -1181,17 +1181,8 @@ sap_restart:
 	 */
 	if (restart_sap ||
 	    ((mcc_to_scc_switch != QDF_MCC_TO_SCC_SWITCH_DISABLE) &&
-	     sta_check &&
-	    !pm_ctx->sta_ap_intf_check_work_info)) {
-		struct sta_ap_intf_check_work_ctx *work_info;
-		work_info = qdf_mem_malloc(
-			sizeof(struct sta_ap_intf_check_work_ctx));
-		pm_ctx->sta_ap_intf_check_work_info = work_info;
-		if (work_info) {
-			work_info->psoc = psoc;
-			qdf_create_work(0, &pm_ctx->sta_ap_intf_check_work,
-				policy_mgr_check_sta_ap_concurrent_ch_intf,
-				work_info);
+	     sta_check)) {
+		if (pm_ctx->sta_ap_intf_check_work_info) {
 			qdf_sched_work(0, &pm_ctx->sta_ap_intf_check_work);
 			policy_mgr_debug("Checking for Concurrent Change interference");
 		}
