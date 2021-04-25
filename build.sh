@@ -66,15 +66,20 @@ esac
 
 [ -e $OUTDIR/.config ] && {
     echo "Starting Compilation..."
+    BUILD_START=$(date +%s)
     make -j$(nproc --all) CC="ccache $TC_CLANG/bin/clang" CROSS_COMPILE=$TC_GCC_ARM64/bin/aarch64-linux-android- CLANG_TRIPLE=$HOME/clang/bin/aarch64-linux-gnu- CROSS_COMPILE_ARM32=$TC_GCC_ARM32/bin/arm-linux-androideabi- O=output
 ret=$?
+    BUILD_END=$(date +%s)
+    DIFF=$(($BUILD_END - $BUILD_START))
+    MINUTES=$(($DIFF / 60))
+    SECONDS=$(($DIFF % 60))
 
 if [ $ret -eq 0 ] && [ "$?" -eq 0 ] ; then
-        echo -n "${color_success}#### build completed successfully"
+        echo -n "${color_success}#### build completed successfully ($MINUTES:$SECONDS (mm:ss)) "
         echo " ####${color_reset}"
         [ -d $PWD/.git ] && git restore $YYLL1 $YYLL2
     else
-        echo -n "${color_failed}#### failed to build some targets"
+        echo -n "${color_failed}#### failed to build some targets ($MINUTES:$SECONDS (mm:ss)) "
         echo " ####${color_reset}"
 fi
 }
