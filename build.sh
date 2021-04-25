@@ -60,11 +60,11 @@ read -p "Do You want To Run Menuconfig? [y|n]: " opt
 
 case ${opt} in
      Y|y) echo "Running menuconfig..." && make menuconfig O=output ;;
-     N|n) echo "Skipping..."
+     N|n) echo "Skipping..." ;;
 esac
 
 
-[ -e $OUTPUT/.config ] && {
+[ -e $OUTDIR/.config ] && {
     echo "Starting Compilation..."
     make -j$(nproc --all) CC="ccache $TC_CLANG/bin/clang" CROSS_COMPILE=$TC_GCC_ARM64/bin/aarch64-linux-android- CLANG_TRIPLE=$HOME/clang/bin/aarch64-linux-gnu- CROSS_COMPILE_ARM32=$TC_GCC_ARM32/bin/arm-linux-androideabi- O=output
 ret=$?
