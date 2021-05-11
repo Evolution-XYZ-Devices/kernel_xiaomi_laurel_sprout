@@ -47,7 +47,6 @@
 #define DSI_CLOCK_BITRATE_RADIX 10
 #define MAX_TE_SOURCE_ID  2
 #define DSI_READ_WRITE_PANEL_DEBUG 0
-#define AOD_BRIGHTNESS 190
 DEFINE_MUTEX(dsi_display_clk_mutex);
 
 static char dsi_display_primary[MAX_CMDLINE_PARAM_LEN];
@@ -465,10 +464,7 @@ int dsi_display_param_store(struct dsi_display *display,uint32_t param)
                         panel->skip_dimming_on= true;
 			if ((display->drm_dev && display->drm_dev->sde_power_mode == SDE_MODE_DPMS_LP1) ||
 			(display->drm_dev && display->drm_dev->sde_power_mode == SDE_MODE_DPMS_LP2)) {
-            if(panel->sansumg_flag)
-			rc = dsi_panel_set_doze_backlight(panel, AOD_BRIGHTNESS);
-            else
-            rc = dsi_panel_set_doze_backlight(panel, AOD_BRIGHTNESS*2);
+			rc = dsi_panel_set_doze_backlight(panel, panel->last_bl_lvl);
 			if (rc)
 				pr_err("failed to set doze mode backlight,rc=%d\n", rc);
 		} else {
